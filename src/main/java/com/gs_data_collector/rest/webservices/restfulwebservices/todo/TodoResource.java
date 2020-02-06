@@ -1,4 +1,4 @@
-package com.gs_data_collector.rest.webservices.restfulwebservices;
+package com.gs_data_collector.rest.webservices.restfulwebservices.todo;
 
 import java.net.URI;
 import java.util.List;
@@ -14,8 +14,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import com.gs_data_collector.rest.webservices.restfulwebservices.todo.Todo;
-import com.gs_data_collector.rest.webservices.restfulwebservices.todo.TodoHardcodedService;
 
 @CrossOrigin(origins="http://localhost:4200")
 @RestController

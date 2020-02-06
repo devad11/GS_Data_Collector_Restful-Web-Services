@@ -1,4 +1,4 @@
-package com.gs_data_collector.rest.webservices.restfulwebservices.basic.auth;
+package com.gs_data_collector.rest.basic.auth;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
