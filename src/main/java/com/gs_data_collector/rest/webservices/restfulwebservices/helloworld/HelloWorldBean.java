@@ -1,4 +1,4 @@
-package com.gs_data_collector.rest.webservices.restfulwebservices;
+package com.gs_data_collector.rest.webservices.restfulwebservices.helloworld;
 
 public class HelloWorldBean {
 	

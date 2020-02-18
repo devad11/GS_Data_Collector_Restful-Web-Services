@@ -1,4 +1,4 @@
-package com.gs_data_collector.rest.webservices.restfulwebservices;
+package com.gs_data_collector.rest.webservices.restfulwebservices.helloworld;
 
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,9 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class HelloWorldController {
 
 	@GetMapping(path = "/hello-world")	
-	public String helloWorld() {
-		return "Hello World";
-	}
+	public String helloWorld() { return "Hello World"; }
 	
 	@GetMapping(path = "/hello-world-bean")	
 	public HelloWorldBean helloWorldBean() {
