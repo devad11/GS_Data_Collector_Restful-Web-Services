@@ -27,18 +27,53 @@ public class WebScrapeJpaResource {
 
     @GetMapping(path = "/webscrape")
     public String helloWorld() throws IOException {
+//        "http://www.javatpoint.com"
+        Document doc = Jsoup.connect("https://www.wikihow.com/wikiHowTo?search=signal+wifi").get();
 
-        Document d = Jsoup.connect("https://www.wikihow.com/wikiHowTo?search=signal+wifi").timeout(6000).get();
-        Elements ele = d.select("div#searchresults_list");
-        //System.out.println(ele);
-        for (Element element : ele.select("div.result")) {
-            String img_url = element.select("div.result_thumb img").attr("src");
-            System.out.println(img_url);
 
-            String title = element.select("div.result_title").text();
+        Elements root = doc.select("*[id]:not([id=\"\"])");
+
+
+        System.out.println(root.forms());
+
+
+
+//        System.out.println(root);
+
+        Elements sections = doc.getAllElements();
+
+        for (Element element : sections) {
+            String title = element.select("div").attr("id");
+//            String img_url = element.select("div.result_thumb img").attr("src");
             System.out.println(title);
-            System.out.println("\n");
         }
+        System.out.println(sections);
+
+        Elements allParents = sections.parents();
+
+
+        Element firstSection = sections.first();
+
+        Element lastSection = sections.last();
+        Element secondSection = sections.get(2);
+        Element parent = firstSection.parent();
+        System.out.println(parent.cssSelector());
+//        Elements children = firstSection.children();
+        Elements siblings = firstSection.siblingElements();
+
+//        String keywords = doc.select("meta[name=keywords]").first().attr("content");
+//        System.out.println("Meta keyword : " + keywords);
+//        String description = doc.select("meta[name=description]").get(0).attr("content");
+//        System.out.println("Meta description : " + description);
+
+//        Elements elem = doc.select("div");
+//        for (Element element : elem) {
+//            String title = element.select("div.id").text();
+//            String img_url = element.select("div.result_thumb img").attr("src");
+//            System.out.println(title);
+//        }
+
+
         return "Hello World";
     }
 
