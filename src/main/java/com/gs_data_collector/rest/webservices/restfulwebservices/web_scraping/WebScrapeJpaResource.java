@@ -3,6 +3,7 @@ package com.gs_data_collector.rest.webservices.restfulwebservices.web_scraping;
 import com.gs_data_collector.rest.webservices.restfulwebservices.todo.Todo;
 import com.gs_data_collector.rest.webservices.restfulwebservices.todo.TodoHardcodedService;
 import com.gs_data_collector.rest.webservices.restfulwebservices.todo.TodoJpaRepository;
+import com.sun.xml.fastinfoset.util.StringArray;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -30,11 +31,24 @@ public class WebScrapeJpaResource {
 //        "http://www.javatpoint.com"
         Document doc = Jsoup.connect("https://www.wikihow.com/wikiHowTo?search=signal+wifi").get();
 
+        Element root = doc.body();
 
-        Elements root = doc.select("*[id]:not([id=\"\"])");
 
 
-        System.out.println(root.forms());
+//        Elements root = doc.select("*[id]:not([id=\"\"])");
+
+
+
+        System.out.println(root.cssSelector());
+
+        System.out.println(root);
+
+
+
+
+
+//        System.out.println(root.eachAttr("a"));
+
 
 
 
