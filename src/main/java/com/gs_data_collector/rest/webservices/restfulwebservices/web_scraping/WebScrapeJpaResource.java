@@ -9,12 +9,14 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.io.IOException;
+import java.io.*;
 import java.net.URI;
+import java.net.URL;
 import java.util.List;
 
 @CrossOrigin(origins="http://localhost:4200")
@@ -26,12 +28,26 @@ public class WebScrapeJpaResource {
     @Autowired
     private WebJpaRepository webJpaRepository;
 
-    @GetMapping(path = "/webscrape")
+    @GetMapping(path = "/webscrape", produces = "text/plain")
     public String helloWorld() throws IOException {
 //        "http://www.javatpoint.com"
-        Document doc = Jsoup.connect("https://www.wikihow.com/wikiHowTo?search=signal+wifi").get();
+//        Document doc = Jsoup.connect("https://www.wikihow.com/wikiHowTo?search=signal+wifi").get();
 
-        Element root = doc.body();
+        String inputLine;
+        String htmlData = "";
+        File htmlFile = new File("htmlFile.html");
+
+        URL oracle = new URL("https://www.wikihow.com/wikiHowTo?search=signal+wifi");
+        BufferedReader in = new BufferedReader(new InputStreamReader(oracle.openStream()));
+        BufferedWriter bw = new BufferedWriter(new FileWriter(htmlFile));
+
+        while ((inputLine = in.readLine()) != null)
+//            bw.write(inputLine + "\n");
+            htmlData += inputLine + "\n";
+        in.close();
+        bw.close();
+
+//        Element root = doc.body();
 
 
 
@@ -39,9 +55,9 @@ public class WebScrapeJpaResource {
 
 
 
-        System.out.println(root.cssSelector());
-
-        System.out.println(root);
+//        System.out.println(root.cssSelector());
+//
+//        System.out.println(root);
 
 
 
@@ -54,26 +70,26 @@ public class WebScrapeJpaResource {
 
 //        System.out.println(root);
 
-        Elements sections = doc.getAllElements();
-
-        for (Element element : sections) {
-            String title = element.select("div").attr("id");
+//        Elements sections = doc.getAllElements();
+//
+//        for (Element element : sections) {
+//            String title = element.select("div").attr("id");
 //            String img_url = element.select("div.result_thumb img").attr("src");
-            System.out.println(title);
-        }
-        System.out.println(sections);
+//            System.out.println(title);
+//        }
+//        System.out.println(sections);
 
-        Elements allParents = sections.parents();
-
-
-        Element firstSection = sections.first();
-
-        Element lastSection = sections.last();
-        Element secondSection = sections.get(2);
-        Element parent = firstSection.parent();
-        System.out.println(parent.cssSelector());
+//        Elements allParents = sections.parents();
+//
+//
+//        Element firstSection = sections.first();
+//
+//        Element lastSection = sections.last();
+//        Element secondSection = sections.get(2);
+//        Element parent = firstSection.parent();
+//        System.out.println(parent.cssSelector());
 //        Elements children = firstSection.children();
-        Elements siblings = firstSection.siblingElements();
+//        Elements siblings = firstSection.siblingElements();
 
 //        String keywords = doc.select("meta[name=keywords]").first().attr("content");
 //        System.out.println("Meta keyword : " + keywords);
@@ -87,8 +103,11 @@ public class WebScrapeJpaResource {
 //            System.out.println(title);
 //        }
 
+        System.out.println(htmlData);
 
-        return "Hello World";
+        String virus = "Hello Baby";
+
+        return virus;
     }
 
     @PostMapping("/webscrape/save")
