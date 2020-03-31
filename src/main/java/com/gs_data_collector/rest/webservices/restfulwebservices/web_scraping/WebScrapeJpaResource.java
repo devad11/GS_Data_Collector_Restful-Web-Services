@@ -1,6 +1,7 @@
 package com.gs_data_collector.rest.webservices.restfulwebservices.web_scraping;
 
 import com.gs_data_collector.rest.webservices.restfulwebservices.todo.TodoJpaRepository;
+import com.sun.xml.fastinfoset.util.StringArray;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -16,6 +17,8 @@ import org.json.*;
 import java.io.*;
 import java.net.URI;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 @CrossOrigin(origins="http://localhost:4200")
 @RestController
@@ -29,7 +32,7 @@ public class WebScrapeJpaResource {
     @GetMapping(path = "/webscrape", produces = "text/plain")
     public String helloWorld() throws IOException, JSONException {
 //        "http://www.javatpoint.com"
-        Document doc = Jsoup.connect("https://www.amazon.co.uk/s?k=hand+sanitiser+gel&crid=2WEUS4IYV8Z2O&sprefix=hand%2Caps%2C156&ref=nb_sb_ss_i_1_4").get();
+        Document doc = Jsoup.connect("https://irish.national-lottery.com/irish-lotto/past-results").get();
 
         String inputLine;
         String htmlData = "";
@@ -46,21 +49,74 @@ public class WebScrapeJpaResource {
 //        bw.close();
 
 //        Element root = doc.body();
-//        String cimek = doc.select("h1.cikkcim").text();
+//        String cimek = doc.select("#search > div.s-desktop-width-max.s-desktop-content.sg-row > div.sg-col-20-of-24.sg-col-28-of-32.sg-col-16-of-20.sg-col.sg-col-32-of-36.sg-col-8-of-12.sg-col-12-of-16.sg-col-24-of-28 > div > span:nth-child(5) > div:nth-child(1) > div:nth-child(2) > div > span > div > div > div:nth-child(3) > h2 > a > span").text();
 //        System.out.println(cimek);
-        for (Element el : doc.select("div.sg-col-inner span div div div.a-section h2 a span"))
-            System.out.println(el.text());
-        System.out.println("------------------------------------------");
+//        for (Element el : doc.select("#content > table > tbody"))
+//            System.out.println(el.text());
+
+        List<String> dates = new ArrayList<String>();
+        Elements test = doc.select("#content > table > tbody > tr > td.noBefore.colour > a");
+
+        for (Element el : test) {
+            dates.add(el.text());
+        }
+
+//        for (String date : dates) {
+//            System.out.println(date);
+//        }
+
+        List<String> numbers = new ArrayList<String>();
+        Elements test2 = doc.select("#content > table > tbody > tr > td.noBefore.nowrap");
+
+        for (Element el2 : test2) {
+            numbers.add(el2.text());
+        }
+
+//        for (String number : numbers) {
+//            System.out.println(number);
+//        }
+
+        List<String> jackpots = new ArrayList<String>();
+        Elements test3 = doc.select("#content > table > tbody > tr > td:nth-child(3)");
+
+        for (Element el3 : test3) {
+            jackpots.add(el3.ownText().replace("€", "").replace(",", ""));
+        }
+
+//        for (String jackpot : jackpots) {
+//            System.out.println(jackpot);
+//        }
+        ArrayList<ArrayList<String> > scrapes = new ArrayList<>();
+        for(int i = 0; i < jackpots.size() - 1; i++) {
+            scrapes.add(new ArrayList<String>());
+
+            scrapes.get(i).add(0, dates.get(i));
+            scrapes.get(i).add(1, numbers.get(i));
+            scrapes.get(i).add(2, jackpots.get(i));
+        }
+
+        System.out.println(scrapes);
+
+//        System.out.println(doc.select("").text());
 
 
 //        Elements root = doc.select("*[id]:not([id=\"\"])");
 
 //        Elements elem = doc.select("*[@id=\"search\"]/div[1]/div[2]/div/span[4]/div[1]/div[2]/div/span/div/div/div[2]/h2/a/span");
-        Elements elem = doc.select("search > div.s-desktop-width-max.s-desktop-content.sg-row > div.sg-col-20-of-24.sg-col-28-of-32.sg-col-16-of-20.sg-col.sg-col-32-of-36.sg-col-8-of-12.sg-col-12-of-16.sg-col-24-of-28 > div > span:nth-child(5) > div:nth-child(1) > div:nth-child(2) > div > span > div > div > div:nth-child(3) > h2 > a > span");
-
-        for (Element ele : elem){
-            System.out.println(ele);
-        }
+//        Elements elem = doc.select("#content > table");
+//        Elements children = null;
+//        Elements children2 = null;
+//        for (Element ele : elem){
+//            children = ele.children();
+////            System.out.println(children.text());
+//        }
+//        for (Element child : children){
+//            System.out.println(child.select("h4").text());
+//            children2 = child.select("div > div.winning-numbers > div > div > div > label");
+//            for (Element child2 : children2){
+//                System.out.println(child2.text());
+//            }
+//        }
 
 //        System.out.println(root.cssSelector());
 //
