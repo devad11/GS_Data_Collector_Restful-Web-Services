@@ -27,16 +27,14 @@ public class WebScrapeJpaResource {
     JdbcTemplate jdbcTemplate;;
     @Autowired
     private WebJpaRepository webJpaRepository;
-    ArrayList<String> info = new ArrayList<String>();
 
     @GetMapping(path = "/webscrape", produces = "text/plain")
     public String helloWorld() throws IOException, ParseException {
 
-        if (info.size() > 3){
-        Document doc = Jsoup.connect(info.get(0)).get();
+        Document doc = Jsoup.connect("https://irish.national-lottery.com/irish-lotto/past-results").get();
 
         List<String> dates = new ArrayList<String>();
-        Elements test = doc.select(info.get(1));
+        Elements test = doc.select("#content > table > tbody > tr > td.noBefore.colour > a");
 
         for (Element el : test) {
 
@@ -45,42 +43,43 @@ public class WebScrapeJpaResource {
             Calendar cal = Calendar.getInstance();
             cal.setTime(new SimpleDateFormat("MMM").parse(breakDate[2]));
             int month = cal.get(Calendar.MONTH) + 1;
+            System.out.println(cal.get(Calendar.MONTH));
             int year = Integer.parseInt(breakDate[3]);
             String dateString = day + "/" + month + "/" + year;
 
 
-            //            String dateInString = el.text();
-            //            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("cccc dd LLLL yyyy", Locale.ENGLISH);
-            //            LocalDate dateTime = LocalDate.parse(dateInString, formatter);
-            //            System.out.println(dateTime);
+//            String dateInString = el.text();
+//            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("cccc dd LLLL yyyy", Locale.ENGLISH);
+//            LocalDate dateTime = LocalDate.parse(dateInString, formatter);
+//            System.out.println(dateTime);
 
-            //            try {
-            //                LocalDate localDate = LocalDate.parse("16-ABC-2016", dtf);
-            //                System.out.println(dtf.format(localDate));
-            //            } catch (DateTimeParseException e) {
-            //                System.err.println("Unable to parse the date!");
-            //                //e.printStackTrace();
-            //            }
+//            try {
+//                LocalDate localDate = LocalDate.parse("16-ABC-2016", dtf);
+//                System.out.println(dtf.format(localDate));
+//            } catch (DateTimeParseException e) {
+//                System.err.println("Unable to parse the date!");
+//                //e.printStackTrace();
+//            }
 
             dates.add(dateString);
         }
 
         List<String> numbers = new ArrayList<String>();
-        Elements test2 = doc.select(info.get(2));
+        Elements test2 = doc.select("#content > table > tbody > tr > td.noBefore.nowrap");
 
         for (Element el2 : test2) {
             numbers.add(el2.text());
         }
 
         List<String> jackpots = new ArrayList<String>();
-        Elements test3 = doc.select(info.get(3));
+        Elements test3 = doc.select("#content > table > tbody > tr > td:nth-child(3)");
 
         for (Element el3 : test3) {
             jackpots.add(el3.ownText().replace("€", "").replace(",", ""));
         }
 
-        ArrayList<ArrayList<String>> scrapes = new ArrayList<>();
-        for (int i = 0; i < jackpots.size() - 1; i++) {
+        ArrayList<ArrayList<String> > scrapes = new ArrayList<>();
+        for(int i = 0; i < jackpots.size() - 1; i++) {
             scrapes.add(new ArrayList<String>());
 
             scrapes.get(i).add(0, dates.get(i));
@@ -91,8 +90,8 @@ public class WebScrapeJpaResource {
         System.out.println(scrapes);
 
         String CREATE_TABLE_SQL = "CREATE TABLE IF NOT EXISTS lotto_numbers ("
-                + "id INT NOT NULL AUTO_INCREMENT,"
-                + "date_of_game DATETIME NOT NULL,"
+                + "id INT NOT NULL,"
+                + "date DATETIME NOT NULL,"
                 + "number VARCHAR(45) NOT NULL,"
                 + "jackpot INT NOT NULL,"
                 + "PRIMARY KEY (id))";
@@ -100,27 +99,18 @@ public class WebScrapeJpaResource {
         jdbcTemplate.execute(CREATE_TABLE_SQL);
 
 
-        for (int i = 0; i < dates.size() - 1; i++) {
+
+        for(int i = 0; i < dates.size() - 1; i++) {
             Date date1 = new SimpleDateFormat("dd/MM/yyyy").parse(scrapes.get(i).get(0));
             jdbcTemplate.update(
-                    "insert into lotto_numbers (date_of_game, number, jackpot) values(?,?,?)",
-                    date1, scrapes.get(i).get(1), Integer.parseInt(scrapes.get(i).get(2)));
+                    "insert into lotto_numbers (id, date, number, jackpot) values(?,?,?,?)",
+                    i, date1, scrapes.get(i).get(1), Integer.parseInt(scrapes.get(i).get(2)));
         }
 
 
-    }
+
 
         return ("Hello");
-    }
-
-    @PostMapping("/webscrape/selector")
-    public ResponseEntity<Void> saveSelector(
-            @RequestBody ArrayList<String> inSelector){
-        info = inSelector;
-
-        System.out.println(info);
-
-        return null;
     }
 
 
