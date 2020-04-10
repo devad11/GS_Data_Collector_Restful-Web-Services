@@ -24,12 +24,12 @@ import java.util.List;
 public class WebScrapeJpaResource {
 
     @Autowired
-    JdbcTemplate jdbcTemplate;;
+    JdbcTemplate jdbcTemplate;
     @Autowired
     private WebJpaRepository webJpaRepository;
 
     @GetMapping(path = "/webscrape", produces = "text/plain")
-    public String helloWorld() throws IOException, ParseException {
+    public String helloWorld(jdbcTemplate) throws IOException, ParseException {
 
         Document doc = Jsoup.connect("https://irish.national-lottery.com/irish-lotto/past-results").get();
 
@@ -43,7 +43,7 @@ public class WebScrapeJpaResource {
             Calendar cal = Calendar.getInstance();
             cal.setTime(new SimpleDateFormat("MMM").parse(breakDate[2]));
             int month = cal.get(Calendar.MONTH) + 1;
-            System.out.println(cal.get(Calendar.MONTH));
+//            System.out.println(cal.get(Calendar.MONTH));
             int year = Integer.parseInt(breakDate[3]);
             String dateString = day + "/" + month + "/" + year;
 
@@ -90,7 +90,7 @@ public class WebScrapeJpaResource {
         System.out.println(scrapes);
 
         String CREATE_TABLE_SQL = "CREATE TABLE IF NOT EXISTS lotto_numbers ("
-                + "id INT NOT NULL,"
+                + "id INT NOT NULL AUTO_INCREMENT,"
                 + "date DATETIME NOT NULL,"
                 + "number VARCHAR(45) NOT NULL,"
                 + "jackpot INT NOT NULL,"
@@ -103,8 +103,8 @@ public class WebScrapeJpaResource {
         for(int i = 0; i < dates.size() - 1; i++) {
             Date date1 = new SimpleDateFormat("dd/MM/yyyy").parse(scrapes.get(i).get(0));
             jdbcTemplate.update(
-                    "insert into lotto_numbers (id, date, number, jackpot) values(?,?,?,?)",
-                    i, date1, scrapes.get(i).get(1), Integer.parseInt(scrapes.get(i).get(2)));
+                    "insert into lotto_numbers (date, number, jackpot) values(?,?,?)",
+                    date1, scrapes.get(i).get(1), Integer.parseInt(scrapes.get(i).get(2)));
         }
 
 
