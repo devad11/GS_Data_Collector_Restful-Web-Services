@@ -38,16 +38,17 @@ public class SchedulingTasks {
         // Schedule a task that will first run at the given date and every 1000ms
         executor.scheduleAtFixedRate(webScrapeJpaResource, Date.from(LocalDateTime.now().plusMinutes(1)
                 .atZone(ZoneId.systemDefault()).toInstant()), 15000);
+        
 
         // Schedule a task with the given cron expression
 //        executor.schedule(task, new CronTrigger("*/5 * * * * MON-FRI"));
     }
 
 //    @Scheduled(cron = "0 00 00 * * *")
-    @Scheduled(fixedRate = 30000, initialDelay = 30000)
-    public void scheduledRun() throws IOException, ParseException {
-        System.out.println("We are in scheduledRun");
-        scheduling(null);
-    }
+//    @Scheduled(fixedRate = 30000, initialDelay = 30000)
+//    public void scheduledRun() throws IOException, ParseException {
+//        System.out.println("We are in scheduledRun");
+//        scheduling(null);
+//    }
 
 }
