@@ -1,6 +1,9 @@
 package com.gs_data_collector.rest.webservices.restfulwebservices.web_scraping;
 
-import com.mysql.cj.xdevapi.Statement;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -13,13 +16,15 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.io.*;
 import java.net.URI;
+import java.sql.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.Date;
 
 @CrossOrigin(origins="http://localhost:4200")
 @RestController
-public class WebScrapeJpaResource {
+public class WebScrapeJpaResource implements Runnable{
 
     @Autowired
     JdbcTemplate jdbcTemplate;
@@ -28,7 +33,9 @@ public class WebScrapeJpaResource {
     ArrayList<String> info = new ArrayList<String>();
 
     @GetMapping(path = "/webscrape", produces = "text/plain")
-    public String webMining() throws IOException, ParseException {
+    public void run() {
+
+        System.out.println("Web Scraper runs!");
 
         String sql = "SELECT loc FROM gs_data.scrape_info where name LIKE \"lotto\"";
 
@@ -41,7 +48,12 @@ public class WebScrapeJpaResource {
         String asfg = "[cvbn dsf";
 
         if (scrapingInfo.length > 3){
-            Document doc = Jsoup.connect(scrapingInfo[0]).get();
+            Document doc = null;
+            try {
+                doc = Jsoup.connect(scrapingInfo[0]).get();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
 
             List<String> dates = new ArrayList<String>();
             Elements test = doc.select(scrapingInfo[1]);
@@ -51,7 +63,11 @@ public class WebScrapeJpaResource {
                 String[] breakDate = el.text().split(" ");
                 int day = Integer.parseInt(breakDate[1].replaceAll("[^\\d]", ""));
                 Calendar cal = Calendar.getInstance();
-                cal.setTime(new SimpleDateFormat("MMM").parse(breakDate[2]));
+                try {
+                    cal.setTime(new SimpleDateFormat("MMM").parse(breakDate[2]));
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
                 int month = cal.get(Calendar.MONTH) + 1;
                 int year = Integer.parseInt(breakDate[3]);
                 String dateString = day + "/" + month + "/" + year;
@@ -106,19 +122,22 @@ public class WebScrapeJpaResource {
 
             jdbcTemplate.execute(CREATE_TABLE_SQL);
 
-
             for (int i = 0; i < dates.size() - 1; i++) {
-                Date date1 = new SimpleDateFormat("dd/MM/yyyy").parse(scrapes.get(i).get(0));
+                Date date1 = null;
+                try {
+                    date1 = new SimpleDateFormat("dd/MM/yyyy").parse(scrapes.get(i).get(0));
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
                 jdbcTemplate.update(
                         "insert into lotto_numbers (date_of_game, number, jackpot) values(?,?,?) ON DUPLICATE KEY UPDATE date_of_game = ?",
                         date1, scrapes.get(i).get(1), Integer.parseInt(scrapes.get(i).get(2)), date1);
             }
 
-
         }
-        System.out.println("Hello");
+        System.out.println("Web Scrape Finished!");
 
-        return ("Hello");
+//        return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/webscrape/selector")
@@ -139,7 +158,84 @@ public class WebScrapeJpaResource {
 
         System.out.println(info);
 
-        return null;
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/table/{tableName}")
+    public String getTable(@PathVariable String tableName) throws SQLException, JSONException {
+
+        JSONArray json = new JSONArray();
+        StringBuilder jsonData = new StringBuilder("[");
+
+        try{
+
+            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/gs_data","springuser","password");
+            Statement stmt = con.createStatement();
+
+            ResultSet rs = stmt.executeQuery("SELECT * FROM " + tableName);
+            ResultSetMetaData rsmd = rs.getMetaData();
+            while(rs.next()){
+                int numColumns = rsmd.getColumnCount();
+                JSONObject obj = new JSONObject();
+
+                for (int i=1; i<numColumns+1; i++) {
+                    String column_name = rsmd.getColumnName(i);
+
+                    if(rsmd.getColumnType(i)==java.sql.Types.ARRAY){
+                        obj.put(column_name, rs.getArray(column_name));
+                    }
+                    else if(rsmd.getColumnType(i)==java.sql.Types.BIGINT){
+                        obj.put(column_name, rs.getInt(column_name));
+                    }
+                    else if(rsmd.getColumnType(i)==java.sql.Types.BOOLEAN){
+                        obj.put(column_name, rs.getBoolean(column_name));
+                    }
+                    else if(rsmd.getColumnType(i)==java.sql.Types.BLOB){
+                        obj.put(column_name, rs.getBlob(column_name));
+                    }
+                    else if(rsmd.getColumnType(i)==java.sql.Types.DOUBLE){
+                        obj.put(column_name, rs.getDouble(column_name));
+                    }
+                    else if(rsmd.getColumnType(i)==java.sql.Types.FLOAT){
+                        obj.put(column_name, rs.getFloat(column_name));
+                    }
+                    else if(rsmd.getColumnType(i)==java.sql.Types.INTEGER){
+                        obj.put(column_name, rs.getInt(column_name));
+                    }
+                    else if(rsmd.getColumnType(i)==java.sql.Types.NVARCHAR){
+                        obj.put(column_name, rs.getNString(column_name));
+                    }
+                    else if(rsmd.getColumnType(i)==java.sql.Types.VARCHAR){
+                        obj.put(column_name, rs.getString(column_name));
+                    }
+                    else if(rsmd.getColumnType(i)==java.sql.Types.TINYINT){
+                        obj.put(column_name, rs.getInt(column_name));
+                    }
+                    else if(rsmd.getColumnType(i)==java.sql.Types.SMALLINT){
+                        obj.put(column_name, rs.getInt(column_name));
+                    }
+                    else if(rsmd.getColumnType(i)==java.sql.Types.DATE){
+                        obj.put(column_name, rs.getDate(column_name));
+                    }
+                    else if(rsmd.getColumnType(i)==java.sql.Types.TIMESTAMP){
+                        obj.put(column_name, rs.getTimestamp(column_name));
+                    }
+
+                    else{
+                        obj.put(column_name, rs.getString(column_name));
+                        jsonData.append(rs.getString(column_name)).append(",");
+                    }
+                }
+                json.put(obj);
+            }
+        con.close();
+            }catch(Exception e){ System.out.println(e);}
+
+        jsonData = new StringBuilder(jsonData.substring(0, jsonData.length() - 1));
+        jsonData.append("]");
+        System.out.println(jsonData);
+
+        return jsonData.toString();
     }
 
 
@@ -162,7 +258,7 @@ public class WebScrapeJpaResource {
 
             return ResponseEntity.created(uri).build();
         }
-        return null;
+        return ResponseEntity.noContent().build();
     }
 
 }

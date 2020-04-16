@@ -37,12 +37,14 @@ public class apiDataResource {
     public String apiDataReceiver(
             @RequestBody String apiData) throws JSONException {
 
+        
+
         String apiDataToParse = "{" + "\"data\":" + apiData + "}";
         JSONObject obj = new JSONObject(apiDataToParse);
         JSONArray data = obj.getJSONArray("data");
         int n = data.length();
 
-        String CREATE_TABLE_SQL = "CREATE TABLE IF NOT EXISTS covid ("
+        String CREATE_TABLE_SQL = "CREATE TABLE IF NOT EXISTS shares ("
                 + "id INT NOT NULL AUTO_INCREMENT,"
                 + "com VARCHAR(64),"
                 + "json_info LONGTEXT NOT NULL,"
@@ -53,7 +55,7 @@ public class apiDataResource {
         for (int i = 0; i < n; ++i) {
             JSONObject v = data.getJSONObject(i);
             jdbcTemplate.update(
-                    "insert into covid (com, json_info) values(?,?)",
+                    "insert into shares (com, json_info) values(?,?)",
                     "n", v.toString());
         }
 
