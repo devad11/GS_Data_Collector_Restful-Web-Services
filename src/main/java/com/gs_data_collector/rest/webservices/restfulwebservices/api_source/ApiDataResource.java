@@ -31,7 +31,7 @@ import java.util.List;
 
 @CrossOrigin(origins="http://localhost:4200")
 @RestController
-public class apiDataResource {
+public class ApiDataResource implements Runnable{
 
     @Autowired
     JdbcTemplate jdbcTemplate;;
@@ -98,4 +98,14 @@ public class apiDataResource {
         }
     }
 
+    @Override
+    public void run() {
+        try {
+            apiDataReceiver("");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
+}

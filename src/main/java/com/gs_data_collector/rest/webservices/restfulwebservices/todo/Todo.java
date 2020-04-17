@@ -92,7 +92,5 @@ public class Todo {
 			return false;
 		return true;
 	}
-	
-	
 
 }
