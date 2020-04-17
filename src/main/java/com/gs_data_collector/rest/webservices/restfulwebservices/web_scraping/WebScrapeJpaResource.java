@@ -1,6 +1,8 @@
 package com.gs_data_collector.rest.webservices.restfulwebservices.web_scraping;
 
 
+import com.gs_data_collector.rest.webservices.restfulwebservices.scheduling.Data_collector;
+import com.gs_data_collector.rest.webservices.restfulwebservices.scheduling.SchedulingTasks;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -30,111 +32,122 @@ public class WebScrapeJpaResource implements Runnable{
     JdbcTemplate jdbcTemplate;
     @Autowired
     private WebJpaRepository webJpaRepository;
+    @Autowired
+    private SchedulingTasks schedulingTasks;
+
     ArrayList<String> info = new ArrayList<String>();
 
     @GetMapping(path = "/webscrape", produces = "text/plain")
     public void run() {
 
+        String sourceUrl = "";
+        ArrayList<String> scrapingInfo = new ArrayList<String>();
+        String taskName = "";
+        ArrayList<String> columnNames = new ArrayList<String>();
+        List<Data_collector> metadata = schedulingTasks.getMetaData();
+
+        for (Data_collector dc : metadata) {
+            if (dc.isProceed() == true && dc.getCollection_type() == 2){
+                sourceUrl = dc.getSource();
+                String[] selectors = dc.getSelectors().split(",");
+                Collections.addAll(scrapingInfo, selectors);
+                taskName = dc.getName();
+                String[] column = dc.getColumn_names().split(",");
+                Collections.addAll(columnNames, column);
+            }
+        }
+
+        // web scrape starts
         System.out.println("Web Scraper runs!");
+        Document doc = null;
+        try {
+            doc = Jsoup.connect(sourceUrl).get();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
-        String sql = "SELECT loc FROM gs_data.scrape_info where name LIKE \"lotto\"";
+        List<String> dates = new ArrayList<String>();
+        Elements test = doc.select(scrapingInfo.get(0));
 
-        String scrapingData = jdbcTemplate.queryForObject(sql, String.class);
+        for (Element el : test) {
 
-        String[] scrapingInfo = scrapingData.split(",");
-
-        System.out.println(Arrays.toString(scrapingInfo));
-
-        String asfg = "[cvbn dsf";
-
-        if (scrapingInfo.length > 3){
-            Document doc = null;
+            String[] breakDate = el.text().split(" ");
+            int day = Integer.parseInt(breakDate[1].replaceAll("[^\\d]", ""));
+            Calendar cal = Calendar.getInstance();
             try {
-                doc = Jsoup.connect(scrapingInfo[0]).get();
-            } catch (IOException e) {
+                cal.setTime(new SimpleDateFormat("MMM").parse(breakDate[2]));
+            } catch (ParseException e) {
                 e.printStackTrace();
             }
-
-            List<String> dates = new ArrayList<String>();
-            Elements test = doc.select(scrapingInfo[1]);
-
-            for (Element el : test) {
-
-                String[] breakDate = el.text().split(" ");
-                int day = Integer.parseInt(breakDate[1].replaceAll("[^\\d]", ""));
-                Calendar cal = Calendar.getInstance();
-                try {
-                    cal.setTime(new SimpleDateFormat("MMM").parse(breakDate[2]));
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
-                int month = cal.get(Calendar.MONTH) + 1;
-                int year = Integer.parseInt(breakDate[3]);
-                String dateString = day + "/" + month + "/" + year;
+            int month = cal.get(Calendar.MONTH) + 1;
+            int year = Integer.parseInt(breakDate[3]);
+            String dateString = day + "/" + month + "/" + year;
 
 
-                //            String dateInString = el.text();
-                //            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("cccc dd LLLL yyyy", Locale.ENGLISH);
-                //            LocalDate dateTime = LocalDate.parse(dateInString, formatter);
-                //            System.out.println(dateTime);
+            //            String dateInString = el.text();
+            //            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("cccc dd LLLL yyyy", Locale.ENGLISH);
+            //            LocalDate dateTime = LocalDate.parse(dateInString, formatter);
+            //            System.out.println(dateTime);
 
-                //            try {
-                //                LocalDate localDate = LocalDate.parse("16-ABC-2016", dtf);
-                //                System.out.println(dtf.format(localDate));
-                //            } catch (DateTimeParseException e) {
-                //                System.err.println("Unable to parse the date!");
-                //                //e.printStackTrace();
-                //            }
+            //            try {
+            //                LocalDate localDate = LocalDate.parse("16-ABC-2016", dtf);
+            //                System.out.println(dtf.format(localDate));
+            //            } catch (DateTimeParseException e) {
+            //                System.err.println("Unable to parse the date!");
+            //                //e.printStackTrace();
+            //            }
 
-                dates.add(dateString);
-            }
-
-            List<String> numbers = new ArrayList<String>();
-            Elements test2 = doc.select(scrapingInfo[2]);
-
-            for (Element el2 : test2) {
-                numbers.add(el2.text());
-            }
-
-            List<String> jackpots = new ArrayList<String>();
-            Elements test3 = doc.select(scrapingInfo[3]);
-
-            for (Element el3 : test3) {
-                jackpots.add(el3.ownText().replace("€", "").replace(",", ""));
-            }
-
-            ArrayList<ArrayList<String>> scrapes = new ArrayList<>();
-            for (int i = 0; i < jackpots.size() - 1; i++) {
-                scrapes.add(new ArrayList<String>());
-
-                scrapes.get(i).add(0, dates.get(i));
-                scrapes.get(i).add(1, numbers.get(i));
-                scrapes.get(i).add(2, jackpots.get(i));
-            }
-
-            System.out.println(scrapes);
-
-            String CREATE_TABLE_SQL = "CREATE TABLE IF NOT EXISTS lotto_numbers ("
-                    + "date_of_game DATETIME NOT NULL,"
-                    + "number VARCHAR(45) NOT NULL,"
-                    + "jackpot INT NOT NULL,"
-                    + "PRIMARY KEY (date_of_game))";
-
-            jdbcTemplate.execute(CREATE_TABLE_SQL);
-
-            for (int i = 0; i < dates.size() - 1; i++) {
-                Date date1 = null;
-                try {
-                    date1 = new SimpleDateFormat("dd/MM/yyyy").parse(scrapes.get(i).get(0));
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
-                jdbcTemplate.update(
-                        "insert into lotto_numbers (date_of_game, number, jackpot) values(?,?,?) ON DUPLICATE KEY UPDATE date_of_game = ?",
-                        date1, scrapes.get(i).get(1), Integer.parseInt(scrapes.get(i).get(2)), date1);
-            }
-
+            dates.add(dateString);
         }
+
+        List<String> numbers = new ArrayList<String>();
+        Elements test2 = doc.select(scrapingInfo.get(1));
+
+        for (Element el2 : test2) {
+            numbers.add(el2.text());
+        }
+
+        List<String> jackpots = new ArrayList<String>();
+        Elements test3 = doc.select(scrapingInfo.get(2));
+
+        for (Element el3 : test3) {
+            jackpots.add(el3.ownText().replace("€", "").replace(",", ""));
+        }
+
+        ArrayList<ArrayList<String>> scrapes = new ArrayList<>();
+        for (int i = 0; i < jackpots.size() - 1; i++) {
+            scrapes.add(new ArrayList<String>());
+
+            scrapes.get(i).add(0, dates.get(i));
+            scrapes.get(i).add(1, numbers.get(i));
+            scrapes.get(i).add(2, jackpots.get(i));
+        }
+
+        System.out.println(scrapes);
+
+        String CREATE_TABLE_SQL = "CREATE TABLE IF NOT EXISTS " + taskName + "("
+                + columnNames.get(0) + " DATETIME NOT NULL,"
+                + columnNames.get(1) + " VARCHAR(400) NOT NULL,"
+                + columnNames.get(2) + " INT NOT NULL,"
+                + "PRIMARY KEY (" + columnNames.get(0) + "))";
+
+        jdbcTemplate.execute(CREATE_TABLE_SQL);
+
+        for (int i = 0; i < dates.size() - 1; i++) {
+            Date date1 = null;
+            try {
+                date1 = new SimpleDateFormat("dd/MM/yyyy").parse(scrapes.get(i).get(0));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            jdbcTemplate.update(
+                    "insert into " + taskName + " values (?,?,?) ON DUPLICATE KEY UPDATE " + columnNames.get(0) + " = ?",
+                    date1,
+                    scrapes.get(i).get(1),
+                    Integer.parseInt(scrapes.get(i).get(2)),
+                    date1);
+        }
+
         System.out.println("Web Scrape Finished!");
 
 //        return ResponseEntity.noContent().build();

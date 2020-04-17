@@ -7,17 +7,15 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-public class SchedulingJpaResource implements SchedulerJpaRepository{
+public class SchedulingJpaResource{
 
     @Autowired
     SchedulerDao schedulerDao;
 
-    @Override
     public List<Data_collector> findWebScrapeTasks() {
         return schedulerDao.findTasks(2);
     }
 
-    @Override
     public List<Data_collector> findApiTasks() {
         return schedulerDao.findTasks(1);
     }
