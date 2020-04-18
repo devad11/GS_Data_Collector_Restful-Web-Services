@@ -38,8 +38,11 @@ public class SchedulingTasks {
         this.executor = taskExecutor;
     }
 
-    public List<Data_collector> getMetaData(){
+    public List<Data_collector> getWebMetaData(){
         return this.listWebScrapeTasks;
+    }
+    public List<Data_collector> getApiMetaData(){
+        return this.listApiTasks;
     }
 
 //    @Scheduled(cron = "0 00 00 * * *")
@@ -47,7 +50,6 @@ public class SchedulingTasks {
     public void scheduledRun() throws IOException, ParseException {
 
         listWebScrapeTasks = schedulingJpaResource.findWebScrapeTasks();
-
         listApiTasks = schedulingJpaResource.findApiTasks();
 
         for (Data_collector webTask : listWebScrapeTasks){
@@ -97,8 +99,49 @@ public class SchedulingTasks {
             }
         }
 
-        for (Data_collector api : listApiTasks){
-//            System.out.println(api.toString());
+        for (Data_collector apiTask : listApiTasks){
+            if (apiTask.getFrequency() == null){
+                System.out.println("No frequency value");
+            }
+            // every 30 sec
+            else if (apiTask.getFrequency() == 1){
+                apiTask.setProceed(true);
+                executor.schedule(apiDataResource, new CronTrigger("*/5 * * * * *"));
+            }
+            // every 15 min
+            else if (apiTask.getFrequency() == 2){
+                apiTask.setProceed(true);
+                executor.schedule(apiDataResource, new CronTrigger("0 15 * * * *"));
+            }
+            // every hour
+            else if (apiTask.getFrequency() == 3){
+                apiTask.setProceed(true);
+                executor.schedule(apiDataResource, new CronTrigger("0 0 * * * *"));
+            }
+            // every 6 hr
+            else if (apiTask.getFrequency() == 4){
+                apiTask.setProceed(true);
+                executor.schedule(apiDataResource, new CronTrigger("0 0 0 */5 * *"));
+            }
+            // every day at 7 am
+            else if (apiTask.getFrequency() == 5){
+                apiTask.setProceed(true);
+                executor.schedule(apiDataResource, new CronTrigger("0 0 7 * * *"));
+            }
+            // every week at Monday 7 am
+            else if (apiTask.getFrequency() == 6){
+                apiTask.setProceed(true);
+                executor.schedule(apiDataResource, new CronTrigger("0 0 7 ? ? MON"));
+            }
+            // every first day of a month at 7 am
+            else if (apiTask.getFrequency() == 7){
+                apiTask.setProceed(true);
+                executor.schedule(apiDataResource, new CronTrigger("0 0 7 1 * ?"));
+            }
+            else{
+                System.out.println("Value is out of range. Please choose value between (1-7)");
+            }
+
         }
 
         System.out.println("We are in scheduledRun");
