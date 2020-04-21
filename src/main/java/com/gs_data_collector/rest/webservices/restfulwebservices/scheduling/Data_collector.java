@@ -17,20 +17,11 @@ public class Data_collector {
     private Long collection_type;
 
     private Long frequency;
-
-    public String getColumn_names() {
-        return column_names;
-    }
-
-    public void setColumn_names(String column_names) {
-        this.column_names = column_names;
-    }
-
     private String made_by;
     private String source;
     private String selectors;
     private String column_names;
-    private LocalDateTime created;
+    private Long created;
     private boolean is_active;
     private boolean proceed;
 
@@ -38,7 +29,7 @@ public class Data_collector {
 
     }
 
-    public Data_collector(String name, Long collection_type, Long frequency, String made_by, String source, String selectors, String column_names, LocalDateTime created, boolean is_active, boolean proceed) {
+    public Data_collector(String name, Long collection_type, Long frequency, String made_by, String source, String selectors, String column_names, Long created, boolean is_active, boolean proceed) {
         this.name = name;
         this.collection_type = collection_type;
         this.frequency = frequency;
@@ -107,11 +98,19 @@ public class Data_collector {
         this.selectors = selectors;
     }
 
-    public LocalDateTime getCreated() {
+    public String getColumn_names() {
+        return column_names;
+    }
+
+    public void setColumn_names(String column_names) {
+        this.column_names = column_names;
+    }
+
+    public Long getCreated() {
         return created;
     }
 
-    public void setCreated(LocalDateTime created) {
+    public void setCreated(Long created) {
         this.created = created;
     }
 

@@ -1,6 +1,7 @@
 package com.gs_data_collector.rest.webservices.restfulwebservices.scheduling;
 
 import com.gs_data_collector.rest.webservices.restfulwebservices.api_source.ApiDataResource;
+import com.gs_data_collector.rest.webservices.restfulwebservices.emailService.SendEmailService;
 import com.gs_data_collector.rest.webservices.restfulwebservices.web_scraping.WebScrapeJpaResource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,11 +9,8 @@ import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.stereotype.Component;
-
 import java.io.IOException;
 import java.text.ParseException;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -22,7 +20,9 @@ import java.util.List;
 public class SchedulingTasks {
 
     @Autowired
-    private SchedulingJpaResource schedulingJpaResource;
+    private SendEmailService sendEmailService;
+    @Autowired
+    private SchedulerJpaRepository schedulerJpaRepository;
     @Autowired
     private WebScrapeJpaResource webScrapeJpaResource;
     @Autowired
@@ -46,23 +46,38 @@ public class SchedulingTasks {
     }
 
 //    @Scheduled(cron = "0 00 00 * * *")
-    @Scheduled(fixedRate = 100000, initialDelay = 30000)
+//    @EventListener(ApplicationReadyEvent.class)
+    @Scheduled(fixedRate = 30000)
     public void scheduledRun() throws IOException, ParseException {
 
-        listWebScrapeTasks = schedulingJpaResource.findWebScrapeTasks();
-        listApiTasks = schedulingJpaResource.findApiTasks();
+//        String subject = "Java send mail example";
+//        String body = "Welcome to JavaMail!";
+//
+//        sendEmailService.sendFromGMail(subject, body);
+
+        System.out.println("List update");
+        listWebScrapeTasks = schedulerJpaRepository.findWebScrapeTasks();
+        listApiTasks = schedulerJpaRepository.findApiTasks();
+        Date date= new Date();
+        long time = date.getTime();
+        System.out.println(time);
 
         for (Data_collector webTask : listWebScrapeTasks){
             if (webTask.getFrequency() == null){
                 System.out.println("No frequency value");
-            }
+        }
             // every 30 sec
             else if (webTask.getFrequency() == 1){
                 webTask.setProceed(true);
-                executor.schedule(webScrapeJpaResource, new CronTrigger("*/5 * * * * *"));
-
-//                executor.scheduleAtFixedRate(apiDataResource, Date.from(LocalDateTime.now().plusMinutes(0)
-//                        .atZone(ZoneId.systemDefault()).toInstant()), 15000);
+                System.out.println("calculation: " + (webTask.getCreated() - time));
+                if (webTask.getCreated() - time <= 0) {
+                    webScrapeJpaResource.run();
+//                    executor.schedule(webScrapeJpaResource, new CronTrigger("*/5 * * * * *"));
+//                    executor.scheduleAtFixedRate(webScrapeJpaResource, Date.from(LocalDateTime.now().plusMinutes(0)
+//                            .atZone(ZoneId.systemDefault()).toInstant()), 15000);
+                    time += 70*1000;
+                    schedulerJpaRepository.updateNextSchedule(webTask.getName(), time);
+                }
             }
             // every 15 min
             else if (webTask.getFrequency() == 2){
@@ -143,9 +158,6 @@ public class SchedulingTasks {
             }
 
         }
-
-        System.out.println("We are in scheduledRun");
-//        scheduling(null);
 
     }
 
