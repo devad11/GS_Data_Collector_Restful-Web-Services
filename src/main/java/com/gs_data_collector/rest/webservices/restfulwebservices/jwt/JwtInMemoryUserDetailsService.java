@@ -20,15 +20,15 @@ public class JwtInMemoryUserDetailsService implements UserDetailsService {
   @Autowired
   UserServiceImp userServiceImp;
 
-  static List<JwtUserDetails> inMemoryUserList = new ArrayList<>();
-
-  static {
-    inMemoryUserList.add(new JwtUserDetails(1L, "adam",
-        "$2a$10$3zHzb.Npv1hfZbLEU5qsdOju/tk2je6W6PnNnY.c1ujWPcZh4PL6e", "ROLE_USER_2"));
-    inMemoryUserList.add(new JwtUserDetails(1L, "devad",
-            "$2a$10$VwqQw.xsubrEmxRYjhAOpuP/wBgWiBM9iJClJKXgh5bU/eommzz1O", "ROLE_USER_2"));
-      
-  }
+//  static List<JwtUserDetails> inMemoryUserList = new ArrayList<>();
+//
+//  static {
+//    inMemoryUserList.add(new JwtUserDetails(1L, "adam",
+//        "$2a$10$3zHzb.Npv1hfZbLEU5qsdOju/tk2je6W6PnNnY.c1ujWPcZh4PL6e", "ROLE_USER_2"));
+//    inMemoryUserList.add(new JwtUserDetails(1L, "devad",
+//            "$2a$10$VwqQw.xsubrEmxRYjhAOpuP/wBgWiBM9iJClJKXgh5bU/eommzz1O", "ROLE_USER_2"));
+//
+//  }
 
   
   @Override
