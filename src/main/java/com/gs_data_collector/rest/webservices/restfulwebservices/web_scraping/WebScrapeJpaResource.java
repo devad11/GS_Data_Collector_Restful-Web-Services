@@ -41,6 +41,7 @@ public class WebScrapeJpaResource implements Runnable{
     @Autowired
     private SchedulingTasks schedulingTasks;
 
+
     ArrayList<String> info = new ArrayList<String>();
 
     @GetMapping(path = "/webscrape", produces = "text/plain")

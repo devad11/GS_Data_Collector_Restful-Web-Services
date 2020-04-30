@@ -21,4 +21,10 @@ public interface SchedulerDao extends JpaRepository<Data_collector, Integer> {
 
     @Query(value = "SELECT * FROM Data_collector Where made_by = :username", nativeQuery=true)
     List<Data_collector> findBymade_by(@Param("username") String username);
+
+    Data_collector findById(long id);
+
+    @Modifying
+    @Transactional
+    void deleteById(long id);
 }

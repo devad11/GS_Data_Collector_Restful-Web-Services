@@ -50,11 +50,6 @@ public class SchedulingTasks {
     @Scheduled(fixedRate = 30000)
     public void scheduledRun() throws IOException, ParseException {
 
-//        String subject = "Java send mail example";
-//        String body = "Welcome to JavaMail!";
-//
-//        sendEmailService.sendFromGMail(subject, body);
-
         System.out.println("List update");
         listWebScrapeTasks = schedulerJpaRepository.findWebScrapeTasks();
         listApiTasks = schedulerJpaRepository.findApiTasks();
@@ -66,6 +61,12 @@ public class SchedulingTasks {
             if (webTask.getFrequency() == null){
                 System.out.println("No frequency value");
         }
+            // only once
+            else if (webTask.getFrequency() == 0){
+                webTask.setProceed(true);
+                webScrapeJpaResource.run();
+
+            }
             // every 30 sec
             else if (webTask.getFrequency() == 1){
                 webTask.setProceed(true);
@@ -75,24 +76,39 @@ public class SchedulingTasks {
 //                    executor.schedule(webScrapeJpaResource, new CronTrigger("*/5 * * * * *"));
 //                    executor.scheduleAtFixedRate(webScrapeJpaResource, Date.from(LocalDateTime.now().plusMinutes(0)
 //                            .atZone(ZoneId.systemDefault()).toInstant()), 15000);
-                    time += 70*1000;
+                    time += 30*1000;
                     schedulerJpaRepository.updateNextSchedule(webTask.getName(), time);
                 }
             }
             // every 15 min
             else if (webTask.getFrequency() == 2){
                 webTask.setProceed(true);
-                executor.schedule(webScrapeJpaResource, new CronTrigger("0 15 * * * *"));
+                System.out.println("calculation: " + (webTask.getCreated() - time));
+                if (webTask.getCreated() - time <= 0) {
+                    webScrapeJpaResource.run();
+                    time += 900*1000;
+                    schedulerJpaRepository.updateNextSchedule(webTask.getName(), time);
+                }
             }
             // every hour
             else if (webTask.getFrequency() == 3){
                 webTask.setProceed(true);
-                executor.schedule(webScrapeJpaResource, new CronTrigger("0 0 * * * *"));
+                System.out.println("calculation: " + (webTask.getCreated() - time));
+                if (webTask.getCreated() - time <= 0) {
+                    webScrapeJpaResource.run();
+                    time += 3600*1000;
+                    schedulerJpaRepository.updateNextSchedule(webTask.getName(), time);
+                }
             }
             // every 6 hr
             else if (webTask.getFrequency() == 4){
                 webTask.setProceed(true);
-                executor.schedule(webScrapeJpaResource, new CronTrigger("0 0 0 */5 * *"));
+                System.out.println("calculation: " + (webTask.getCreated() - time));
+                if (webTask.getCreated() - time <= 0) {
+                    webScrapeJpaResource.run();
+                    time += 21600*1000;
+                    schedulerJpaRepository.updateNextSchedule(webTask.getName(), time);
+                }
             }
             // every day at 7 am
             else if (webTask.getFrequency() == 5){
@@ -110,7 +126,7 @@ public class SchedulingTasks {
                 executor.schedule(webScrapeJpaResource, new CronTrigger("0 0 7 1 * ?"));
             }
             else{
-                System.out.println("Value is out of range. Please choose value between (1-7)");
+                System.out.println("Value is out of range. Please choose value between (0-7)");
             }
         }
 

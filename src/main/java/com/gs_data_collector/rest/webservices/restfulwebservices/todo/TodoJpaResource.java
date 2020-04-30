@@ -30,10 +30,10 @@ public class TodoJpaResource {
 		return todoJpaRepository.findByUsername(username);
 	}
 	
-	@GetMapping("/jpa/users/{username}/todo/{id}")
-	public Todo getTodo(@PathVariable String username, @PathVariable long id){
-		return todoJpaRepository.findById(id).get();
-	}
+//	@GetMapping("/jpa/users/{username}/todo/{id}")
+//	public Todo getTodo(@PathVariable String username, @PathVariable long id){
+//		return todoJpaRepository.findById(id).get();
+//	}
 	
 	@DeleteMapping("/jpa/users/{username}/todos/{id}")
 	public  ResponseEntity<Void> deleteTodo(@PathVariable String username, @PathVariable long id){	
