@@ -161,16 +161,16 @@ public class WebScrapeJpaResource implements Runnable{
     }
 
     @PostMapping("/webscrape/selector")
-    public ResponseEntity<Void> saveSelector(
+    public String saveSelector(
             @RequestBody Data_collector data_collector){
 
         System.out.println(data_collector.toString());
         Data_collector createdData = webJpaRepository.save(data_collector);
 
-        return ResponseEntity.noContent().build();
+        return "Hello";
     }
 
-    @GetMapping("/getwebscrape")
+    @PostMapping("/getwebscrape")
     public String testScraper(
             @RequestBody Data_collector data_collector){
 
