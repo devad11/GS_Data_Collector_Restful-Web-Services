@@ -137,7 +137,16 @@ public class SchedulingTasks {
             // every 30 sec
             else if (apiTask.getFrequency() == 1){
                 apiTask.setProceed(true);
-                executor.schedule(apiDataResource, new CronTrigger("*/5 * * * * *"));
+                System.out.println("calculation: " + (apiTask.getCreated() - time));
+                if (apiTask.getCreated() - time <= 0) {
+                    apiDataResource.run();
+//                    executor.schedule(webScrapeJpaResource, new CronTrigger("*/5 * * * * *"));
+//                    executor.scheduleAtFixedRate(webScrapeJpaResource, Date.from(LocalDateTime.now().plusMinutes(0)
+//                            .atZone(ZoneId.systemDefault()).toInstant()), 15000);
+                    time += 30*1000;
+                    schedulerJpaRepository.updateNextSchedule(apiTask.getName(), time);
+                }
+//                executor.schedule(apiDataResource, new CronTrigger("*/5 * * * * *"));
             }
             // every 15 min
             else if (apiTask.getFrequency() == 2){

@@ -38,8 +38,9 @@ public class RegisterService {
         String subject = "GS Data Collector Access Request (" + regInfo.getName() + ")";
         String body = regInfo.getName() + " would like access to GS Data Collector for the following reason : "
                 + regInfo.getReason() + "\n"
-                + "Please after the request assessed contact this employee on the following eamil address: \n"
-                + regInfo.getEmail() + "\n Thank you!";
+                + "Please after the request assessed contact this employee on the following Email address: \n"
+                + regInfo.getEmail() + "\n Thank you!\n"
+                + "http://localhost:4200/request";
 
         sendEmailService.sendFromGMail(subject, body);
 
