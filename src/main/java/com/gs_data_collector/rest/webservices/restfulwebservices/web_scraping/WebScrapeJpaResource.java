@@ -1,10 +1,8 @@
 package com.gs_data_collector.rest.webservices.restfulwebservices.web_scraping;
 
 
-import com.gs_data_collector.rest.webservices.restfulwebservices.api_source.apiDataJpaRepository;
 import com.gs_data_collector.rest.webservices.restfulwebservices.dao.SchedulerDao;
 import com.gs_data_collector.rest.webservices.restfulwebservices.scheduling.Data_collector;
-import com.gs_data_collector.rest.webservices.restfulwebservices.scheduling.SchedulerJpaRepository;
 import com.gs_data_collector.rest.webservices.restfulwebservices.scheduling.SchedulingTasks;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -14,14 +12,10 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.io.*;
-import java.net.URI;
 import java.sql.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;

@@ -1,7 +1,6 @@
 package com.gs_data_collector.rest.webservices.restfulwebservices.scheduling;
 
 import com.gs_data_collector.rest.webservices.restfulwebservices.dao.SchedulerDao;
-import com.gs_data_collector.rest.webservices.restfulwebservices.todo.Todo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
