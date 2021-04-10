@@ -1,7 +1,5 @@
 package com.gs_data_collector.rest.webservices.restfulwebservices.scheduling;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;

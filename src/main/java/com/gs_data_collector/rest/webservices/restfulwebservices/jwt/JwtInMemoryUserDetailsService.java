@@ -1,14 +1,8 @@
 package com.gs_data_collector.rest.webservices.restfulwebservices.jwt;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-
 import com.gs_data_collector.rest.webservices.restfulwebservices.entities.User;
 import com.gs_data_collector.rest.webservices.restfulwebservices.service.UserServiceImp;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;

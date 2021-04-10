@@ -29,7 +29,6 @@ public class ApiDataResource implements Runnable{
             @RequestBody String apiData) throws JSONException, IOException {
 
         List<Data_collector> metadata = schedulingTasks.getApiMetaData();
-//        System.out.println(metadata);
         String sourceUrl = "";
         String taskName = "";
 
@@ -65,12 +64,6 @@ public class ApiDataResource implements Runnable{
                             taskName, v.toString());
                 }
 
-                //        for(int i = 0; i < dates.size() - 1; i++) {
-                //            Date date1 = new SimpleDateFormat("dd/MM/yyyy").parse(scrapes.get(i).get(0));
-                //            jdbcTemplate.update(
-                //                    "insert into lotto_numbers (id, date, number, jackpot) values(?,?,?,?)",
-                //                    i, date1, scrapes.get(i).get(1), Integer.parseInt(scrapes.get(i).get(2)));
-                //        }
             }
         }
             return "Success";
@@ -93,9 +86,7 @@ public class ApiDataResource implements Runnable{
                     response.append(readLine);
                 }
                 in.close();
-                // print result
                 System.out.println("JSON String Result " + response.toString());
-                //GetAndPost.POSTRequest(response.toString());
                 return response.toString();
             } else {
                 return "GET REQUEST FAILED";

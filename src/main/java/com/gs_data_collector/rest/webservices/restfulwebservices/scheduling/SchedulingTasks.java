@@ -45,8 +45,6 @@ public class SchedulingTasks {
         return this.listApiTasks;
     }
 
-//    @Scheduled(cron = "0 00 00 * * *")
-//    @EventListener(ApplicationReadyEvent.class)
     @Scheduled(fixedRate = 30000)
     public void scheduledRun() throws IOException, ParseException {
 
@@ -73,9 +71,6 @@ public class SchedulingTasks {
                 System.out.println("calculation: " + (webTask.getCreated() - time));
                 if (webTask.getCreated() - time <= 0) {
                     webScrapeJpaResource.run();
-//                    executor.schedule(webScrapeJpaResource, new CronTrigger("*/5 * * * * *"));
-//                    executor.scheduleAtFixedRate(webScrapeJpaResource, Date.from(LocalDateTime.now().plusMinutes(0)
-//                            .atZone(ZoneId.systemDefault()).toInstant()), 15000);
                     time += 30*1000;
                     schedulerJpaRepository.updateNextSchedule(webTask.getName(), time);
                 }
@@ -140,13 +135,10 @@ public class SchedulingTasks {
                 System.out.println("calculation: " + (apiTask.getCreated() - time));
                 if (apiTask.getCreated() - time <= 0) {
                     apiDataResource.run();
-//                    executor.schedule(webScrapeJpaResource, new CronTrigger("*/5 * * * * *"));
-//                    executor.scheduleAtFixedRate(webScrapeJpaResource, Date.from(LocalDateTime.now().plusMinutes(0)
-//                            .atZone(ZoneId.systemDefault()).toInstant()), 15000);
                     time += 30*1000;
                     schedulerJpaRepository.updateNextSchedule(apiTask.getName(), time);
                 }
-//                executor.schedule(apiDataResource, new CronTrigger("*/5 * * * * *"));
+
             }
             // every 15 min
             else if (apiTask.getFrequency() == 2){
@@ -154,9 +146,6 @@ public class SchedulingTasks {
                 System.out.println("calculation: " + (apiTask.getCreated() - time));
                 if (apiTask.getCreated() - time <= 0) {
                     apiDataResource.run();
-//                    executor.schedule(webScrapeJpaResource, new CronTrigger("*/5 * * * * *"));
-//                    executor.scheduleAtFixedRate(webScrapeJpaResource, Date.from(LocalDateTime.now().plusMinutes(0)
-//                            .atZone(ZoneId.systemDefault()).toInstant()), 15000);
                     time += 90 * 1000;
                     schedulerJpaRepository.updateNextSchedule(apiTask.getName(), time);
                 }

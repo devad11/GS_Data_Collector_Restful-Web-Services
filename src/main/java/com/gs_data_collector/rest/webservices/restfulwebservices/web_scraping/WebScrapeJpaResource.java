@@ -85,20 +85,6 @@ public class WebScrapeJpaResource implements Runnable{
                     int year = Integer.parseInt(breakDate[3]);
                     String dateString = day + "/" + month + "/" + year;
 
-
-                    //            String dateInString = el.text();
-                    //            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("cccc dd LLLL yyyy", Locale.ENGLISH);
-                    //            LocalDate dateTime = LocalDate.parse(dateInString, formatter);
-                    //            System.out.println(dateTime);
-
-                    //            try {
-                    //                LocalDate localDate = LocalDate.parse("16-ABC-2016", dtf);
-                    //                System.out.println(dtf.format(localDate));
-                    //            } catch (DateTimeParseException e) {
-                    //                System.err.println("Unable to parse the date!");
-                    //                //e.printStackTrace();
-                    //            }
-
                     dates.add(dateString);
                 }
 
@@ -152,7 +138,6 @@ public class WebScrapeJpaResource implements Runnable{
             }
         }
 
-//        return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/webscrape/selector")
@@ -185,6 +170,7 @@ public class WebScrapeJpaResource implements Runnable{
             if (!sourceUrl.equals("")) {
         try {
             doc = Jsoup.connect(sourceUrl).get();
+            System.out.println(doc);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -205,20 +191,6 @@ public class WebScrapeJpaResource implements Runnable{
             int month = cal.get(Calendar.MONTH) + 1;
             int year = Integer.parseInt(breakDate[3]);
             String dateString = day + "/" + month + "/" + year;
-
-
-            //            String dateInString = el.text();
-            //            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("cccc dd LLLL yyyy", Locale.ENGLISH);
-            //            LocalDate dateTime = LocalDate.parse(dateInString, formatter);
-            //            System.out.println(dateTime);
-
-            //            try {
-            //                LocalDate localDate = LocalDate.parse("16-ABC-2016", dtf);
-            //                System.out.println(dtf.format(localDate));
-            //            } catch (DateTimeParseException e) {
-            //                System.err.println("Unable to parse the date!");
-            //                //e.printStackTrace();
-            //            }
 
             dates.add(dateString);
         }
@@ -247,9 +219,6 @@ public class WebScrapeJpaResource implements Runnable{
         }
 
         System.out.println(scrapes);
-//        for (ArrayList<String> scrape : scrapes){
-//            res += scrape + ", ";
-//        }
                 res = scrapes.toString();
         return res;
     }

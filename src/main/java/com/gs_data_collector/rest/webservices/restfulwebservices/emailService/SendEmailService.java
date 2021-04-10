@@ -9,18 +9,12 @@ import javax.mail.internet.*;
 @RestController
 public class SendEmailService {
 
-    private static String USER_NAME = "de.vad111";  // GMail user name (just the part before "@gmail.com")
-    private static String PASSWORD = "hammer11"; // GMail password
-    private static String RECIPIENT = "adam.devenyi@mycit.ie";
+    private static String USER_NAME = "TEST";  // GMail user name (just the part before "@gmail.com")
+    private static String PASSWORD = "TEST"; // GMail password
+    private static String RECIPIENT = "TEST";
     private static String[] to = { RECIPIENT };
 
-//        String from = USER_NAME;
-//        String pass = PASSWORD;
-//        String[] to = { RECIPIENT }; // list of recipient email addresses
-//        String subject = "Java send mail example";
-//        String body = "Welcome to JavaMail!";
-//
-//        sendFromGMail(from, pass, to, subject, body);
+
 
 
     public static void sendFromGMail(String subject, String body) {
